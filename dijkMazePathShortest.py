@@ -1,5 +1,7 @@
 import streamlit as st
-from pyamaze import maze, agent, COLOR, textLabel
+import numpy as np
+import matplotlib.pyplot as plt
+from pyamaze import maze, agent, COLOR
 
 # Create title for the app
 st.title("Maze Visualization with Dijkstra's Algorithm")
@@ -64,14 +66,21 @@ start_options = [(i, j) for i in range(myMaze.rows) for j in range(myMaze.cols)]
 start_point = st.selectbox("Select Start Point", start_options, format_func=lambda x: f"({x[0]}, {x[1]})")
 end_point = st.selectbox("Select End Point", start_options, format_func=lambda x: f"({x[0]}, {x[1]})")
 
-# Check if both start and end points are selected before running the maze
 if st.button("Find Your Way") and start_point and end_point:
     # Set the goal for the maze
     myMaze._goal = end_point
     path, cost = dijkstra(myMaze, *hurdles, start=start_point)
-    textLabel(myMaze, 'Total Cost', cost)
 
-    a = agent(myMaze, start_point[0], start_point[1], color=COLOR.cyan, filled=True, footprints=True)
-    myMaze.tracePath({a: path})
-
-    myMaze.run()
+    # Create a visualization using matplotlib
+    plt.figure(figsize=(10, 6))
+    
+    # Draw the maze
+    myMaze.drawMaze()  # Use the drawMaze method to visualize the maze
+    
+    # Highlight the path
+    for cell in path:
+        plt.plot(cell[1], cell[0], 'bo')  # Mark the path with blue circles
+    
+    plt.title(f'Total Cost: {cost}')
+    plt.axis('off')  # Hide axes
+    st.pyplot(plt)  # Display the plot in Streamlit
